@@ -21,6 +21,7 @@
   "devDependencies": {
     "@nuxt/eslint": "^1.7.1",
     "eslint": "^9.32.0",
+    "nuxt-cron": "^1.8.0",
     "typescript": "^5.8.3"
   }
 }

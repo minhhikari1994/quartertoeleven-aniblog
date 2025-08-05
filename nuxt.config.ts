@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  modules: ['@nuxt/ui', '@nuxt/eslint', '@nuxtjs/google-fonts'],
+  modules: ['@nuxt/ui', '@nuxt/eslint', '@nuxtjs/google-fonts', 'nuxt-cron'],
 
   colorMode: {
     preference: 'light',
