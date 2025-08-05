@@ -1,13 +1,21 @@
 <template>
-    <UModal open :ui="{ content: 'xl:max-w-[60vw] max-w-[90vw] p-5 bg-[#f4f4f4] overflow-y-scroll' }">
-        <template #content>
+    <UModal
+        :ui="{ 
+            content: 'xl:max-w-[60vw] max-w-[90vw] bg-[#f4f4f4] rounded-none overflow-y-scroll',
+            header: 'sm:p-0 p-0 min-h-0 flex-row-reverse border-0'
+        }">
+        <template #header>
+            <UButton class="bg-primary rounded-none relative align-end" color="secondary" icon="i-lucide-x" @click="$emit('close')" size="xs" />
+        </template>
+        <template #body class="">
             <div class="flex lg:flex-row flex-col xl:max-h-[61vh] max-h-[80vh]">
                 <div class="basis-1/3 lg:pr-5">
                     <div class="lg:hidden">
                         <div class="bg-[#1f1f1f] p-2 text-white text-center font-bold text-xl xl:table">
                             <p class="">Kaoru Hana wa Rin to Saku</p>
                         </div>
-                        <div class="border-2 border-primary border-t-0 border-b-0 font-bold p-1 text-primary text-center xl:table">
+                        <div
+                            class="border-2 border-primary border-t-0 border-b-0 font-bold p-1 text-primary text-center xl:table">
                             <p class="text-xs">CloverWorks</p>
                         </div>
                     </div>
@@ -29,7 +37,8 @@
                 <div class="basis-2/3">
                     <div class="flex flex-col gap-3 h-full jusitfy-between">
                         <div>
-                            <div class="bg-[#1f1f1f] p-2 text-white text-center font-bold text-xl lg:table hidden lg:block">
+                            <div
+                                class="bg-[#1f1f1f] p-2 text-white text-center font-bold text-xl lg:table hidden lg:block">
                                 <p class="">Kaoru Hana wa Rin to Saku</p>
                             </div>
                             <div
@@ -115,5 +124,8 @@
 
         </template>
     </UModal>
-
 </template>
+
+<script setup lang="js">
+
+</script>
