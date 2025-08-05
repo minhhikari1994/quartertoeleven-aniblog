@@ -4,9 +4,9 @@
             <span>daily anime</span>
         </div>
         <div class="text-white font-bold grow content-end">
-            <div class="w-full">
-                <UNavigationMenu highlight highlight-color="secondary" :items="daily"
-                    class="w-full justify-end p-none" />
+            <div>
+                <UNavigationMenu highlight highlight-color="secondary" :items="populateDaysInWeekNavItems()"
+                    class="justify-end p-none" />
             </div>
         </div>
     </div>
@@ -15,16 +15,8 @@
 
         <div class="my-4 flex flex-wrap gap-5 justify-center">
             <AnimeEntry v-for="dailyAnime in dailyAnimeData" :key="dailyAnime.mal_id" class="2xl:w-xs w-sm"
-                @click="openAnimeEntryModal" :title="dailyAnime.title" :studios="dailyAnime.studios" :image="dailyAnime.image" />
-            <!-- <AnimeEntry class="2xl:w-xs w-sm" title="Game Center Shoujo to Ibunka Kouryuu" @click="openAnimeEntryModal" />
-            <AnimeEntry class="2xl:w-xs w-sm" title="Kaoru Hana wa Rin to Saku" />
-            <AnimeEntry class="2xl:w-xs w-sm" title="Seishun Buta Yarou wa Santa Claus no Yume wo Minai" />
-            <AnimeEntry class="2xl:w-xs w-sm" title="Game Center Shoujo to Ibunka Kouryuu" />
-            <AnimeEntry class="2xl:w-xs w-sm" title="Kaoru Hana wa Rin to Saku" />
-            <AnimeEntry class="2xl:w-xs w-sm" title="Seishun Buta Yarou wa Santa Claus no Yume wo Minai" />
-            <AnimeEntry class="2xl:w-xs w-sm" title="Game Center Shoujo to Ibunka Kouryuu" />
-            <AnimeEntry class="2xl:w-xs w-sm" title="Kaoru Hana wa Rin to Saku" />
-            <AnimeEntry class="2xl:w-xs w-sm" title="Seishun Buta Yarou wa Santa Claus no Yume wo Minai" /> -->
+                @click="openAnimeEntryModal" :title="dailyAnime.title" :studios="dailyAnime.studios"
+                :image="dailyAnime.image" />
         </div>
     </div>
 
@@ -35,53 +27,44 @@
 import AnimeEntry from '~/components/AnimeEntry.vue';
 import AnimeEntryModal from '~/components/AnimeEntryModal.vue';
 
+const { data: allDailyAnimeData } = await useFetch('/api/dailyAnime')
+const dailyAnimeData = ref([]);
+
+const selectedDay = ref('mon')
+const dailyItemClasses = 'py-0 text-[#f4f4f4]'
+const daysInWeek = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+
 const overlay = useOverlay()
 const animeModal = overlay.create(AnimeEntryModal)
 
-const { data: dailyAnimeData } = await useFetch('/api/dailyAnime')
+onMounted(async () => {
+    dailyAnimeData.value = allDailyAnimeData.value
+    getAnimeListForSelectedDay()
+    console.log(allDailyAnimeData.value)
+})
 
-const dailyItemClasses = 'py-0 text-[#f4f4f4]'
+const populateDaysInWeekNavItems = () => {
+    return daysInWeek.map((day) => {
+        return {
+            label: day,
+            active: day === selectedDay.value,
+            class: dailyItemClasses,
+            onSelect: ($event) => {
+                selectedDay.value = day
+                populateDaysInWeekNavItems()
+                getAnimeListForSelectedDay()
+            }
+        }
+    })
+}
 
-const daily = ref([
-    {
-        label: 'mon',
-        class: dailyItemClasses
-    },
-    {
-        label: 'tue',
-        class: dailyItemClasses
-    },
-    {
-        label: 'tue',
-        class: dailyItemClasses
-    },
-    {
-        label: 'wed',
-        class: dailyItemClasses
-    },
-    {
-        label: 'thu',
-        class: dailyItemClasses
-    },
-    {
-        label: 'fri',
-        class: dailyItemClasses
-    },
-    {
-        label: 'sat',
-        class: dailyItemClasses,
-        active: true
-    },
-    {
-        label: 'sun',
-        class: dailyItemClasses
-    },
-
-])
+const getAnimeListForSelectedDay = () => {
+    const animeOnSelectedDay = allDailyAnimeData.value.filter(dailyAnime => dailyAnime.my_status.watch_on === selectedDay.value)
+    dailyAnimeData.value = animeOnSelectedDay
+}
 
 const openAnimeEntryModal = () => {
     animeModal.open()
 }
 
-console.log(dailyAnimeData.value)
 </script>

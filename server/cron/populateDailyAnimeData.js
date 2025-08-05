@@ -1,16 +1,17 @@
 import { defineCronHandler } from '#nuxt/cron'
+import dailyAnimeData from './dailyAnime.json'
 
 const fetchMALData = async () => {
     try {
         const malResponse = await $fetch('https://api.myanimelist.net/v2/users/minhhikari1994/animelist', {
             query: {
-                limit: 10,
+                limit: 50,
                 sort: 'list_updated_at',
                 fields: 'list_status, num_episodes, studios, genres, synopsis, status, num_scoring_users, mean',
                 nsfw: true
             },
             headers: {
-                'X-MAL-CLIENT-ID': process.env.MAL_KEY
+                'X-MAL-CLIENT-ID': ''
             }
         })
         return malResponse
@@ -22,7 +23,7 @@ const fetchMALData = async () => {
     }
 }
 
-const populateDailyAnimeEntry = (malAnimeData) => {
+const populateDailyAnimeEntry = (malAnimeData, dailyAnimeIds) => {
     const animeInfo = malAnimeData.node
     const myStatus = malAnimeData.list_status
     const result = {
@@ -40,19 +41,35 @@ const populateDailyAnimeEntry = (malAnimeData) => {
             current_status: myStatus.status,
             watched_episodes: myStatus.num_episodes_watched,
             personal_score: myStatus.score,
-            watch_on: "sunday"
+            watch_on: dailyAnimeIds[animeInfo.id.toString()]
         },
     }
+
+    console.log(result)
 
     return result
 }
 
-const populateDailyAnimeData = async () => {
-    const malData = await fetchMALData()
+const getDailyAnimeIds = () => {
+    const result = {}
+    for (const key in dailyAnimeData) {
+        for (const malUrl of dailyAnimeData[key]) {
+            const urlSegments = malUrl.split('/')
+            const malId = urlSegments[urlSegments.length - 2]
+            result[malId] = key
+        }
+    }
+    return result
+}
 
-    console.log(malData)
+const populateDailyAnimeData = async () => {
+    const dailyAnimeIds = getDailyAnimeIds()
+    const malData = await fetchMALData()
     
-    const populatedDailyData = malData.data.map(malAnimeEntry => populateDailyAnimeEntry(malAnimeEntry))
+    const allAnimeIds = Object.keys(dailyAnimeIds).map(malId => parseInt(malId))
+    
+    const dailyAnimeData = malData.data.filter(malAnimeEntry => allAnimeIds.includes(malAnimeEntry.node.id))
+    const populatedDailyData = dailyAnimeData.map(malAnimeEntry => populateDailyAnimeEntry(malAnimeEntry, dailyAnimeIds))
 
     return populatedDailyData || []
 }
@@ -60,6 +77,6 @@ const populateDailyAnimeData = async () => {
 export default defineCronHandler('daily', async () => {
     console.log('Populating daily anime schedule..,', new Date().toLocaleString())
     const result = await populateDailyAnimeData()
-    // console.log('hahahahah', result)
     await useStorage().setItem('dailyAnimeData', result)
+    console.log('Done!')
 }, { runOnInit: true, timeZone: 'UTC+7' })
