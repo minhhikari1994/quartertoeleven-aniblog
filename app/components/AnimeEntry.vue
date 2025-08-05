@@ -1,5 +1,11 @@
 <template>
-    <UCard class="grayscale hover:grayscale-0 hover:cursor-pointer">
+    <UCard
+        class="grayscale hover:grayscale-0 hover:cursor-pointer"
+        :ui="{ 
+            root: 'flex flex-col justify-between',
+            body: 'border-0'
+        }"
+    >
         <img :src="image" class="w-75 m-auto" />
         <template #footer>
             <div class="bg-[#1f1f1f] p-2 text-center text-white font-bold items-center whitespace-nowrap">
