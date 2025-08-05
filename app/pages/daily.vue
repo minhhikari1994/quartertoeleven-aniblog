@@ -15,7 +15,7 @@
 
         <div class="my-4 flex flex-wrap gap-5 justify-center">
             <AnimeEntry v-for="dailyAnime in dailyAnimeData" :key="dailyAnime.mal_id" class="2xl:w-xs w-sm"
-                @click="openAnimeEntryModal" :title="dailyAnime.title" :studios="dailyAnime.studios"
+                @click="openAnimeEntryModal(dailyAnime)" :title="dailyAnime.title" :studios="dailyAnime.studios"
                 :image="dailyAnime.image" />
         </div>
     </div>
@@ -63,8 +63,10 @@ const getAnimeListForSelectedDay = () => {
     dailyAnimeData.value = animeOnSelectedDay
 }
 
-const openAnimeEntryModal = () => {
-    animeModal.open()
+const openAnimeEntryModal = (animeEntry) => {
+    animeModal.open({
+        animeEntry
+    })
 }
 
 </script>
