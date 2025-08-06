@@ -1,7 +1,7 @@
 <template>
     <UModal
         :ui="{ 
-            content: 'xl:max-w-[60vw] max-w-[90vw] bg-[#f4f4f4] rounded-none overflow-y-scroll',
+            content: 'xl:max-w-[60vw] max-w-[90vw] bg-[#f4f4f4] rounded-none overflow-y-auto',
             header: 'sm:p-0 p-0 min-h-0 flex-row-reverse border-0'
         }">
         <template #header>
@@ -53,14 +53,16 @@
 
                         <div class="border-2 border-primary p-1 text-primary text-md h-full overflow-y-auto space-y-3" v-html="animeEntry.synopsis.replace(/\n/g, '<br>')"></div>
 
-                        <!-- <div class="border-2 border-primary border-t-0">
+                        <div class="border-2 border-primary border-t-0">
                             <div class="bg-[#1f1f1f] p-2 text-center text-secondary items-center">
                                 <p class="text-xs">external links</p>
                             </div>
-                            <div class="bg-[#f4f4f4] p-1 text-center text-primary items-center text-sm">
-                                <p class=""></p>
+                            <div class="bg-[#f4f4f4] p-1 text-primary text-sm">
+                                <div class="flex gap-5 xl:max-w-[38vw] lg:max-w-[56vw] w-auto whitespace-nowrap overflow-x-auto p-2">
+                                    <NuxtLink class="underline" v-for="ext_link in animeEntry.external_links" :to="ext_link.url" target="_blank">{{ ext_link.name }}</NuxtLink>
+                                </div>
                             </div>
-                        </div> -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -70,6 +72,8 @@
 </template>
 
 <script setup lang="js">
+import { NuxtLink } from '#components';
+
 
 defineProps({
     animeEntry: {

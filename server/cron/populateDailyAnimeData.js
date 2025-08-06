@@ -23,7 +23,22 @@ const fetchMALData = async () => {
     }
 }
 
-const populateDailyAnimeEntry = (malAnimeData, dailyAnimeIds) => {
+const fetchJikanData = async (animeId) => {
+    try {
+        const jikanResponse = await $fetch(`https://api.jikan.moe/v4/anime/${animeId}/full`)
+        return jikanResponse
+    } catch (err) {
+        console.error(`======================Failed to fetch Jikan data for anime ${animeId}=====================`)
+        console.error(err);
+        return null
+    }
+}
+
+const delay = (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const populateDailyAnimeEntry = async (malAnimeData, dailyAnimeIds) => {
     const animeInfo = malAnimeData.node
     const myStatus = malAnimeData.list_status
     const result = {
@@ -44,8 +59,19 @@ const populateDailyAnimeEntry = (malAnimeData, dailyAnimeIds) => {
             watch_on: dailyAnimeIds[animeInfo.id.toString()]
         },
     }
-
-    console.log(result)
+    
+    const animeJikanResponse = await fetchJikanData(animeInfo.id)
+    result.external_links = []
+    if (animeJikanResponse) {
+        const jikanInfo = animeJikanResponse.data
+        result.external_links = jikanInfo.external
+    }
+    result.external_links.unshift(
+        {
+            name: 'MAL',
+            url: `https://myanimelist.net/anime/${animeInfo.id}`
+        }
+    )
 
     return result
 }
@@ -69,7 +95,14 @@ const populateDailyAnimeData = async () => {
     const allAnimeIds = Object.keys(dailyAnimeIds).map(malId => parseInt(malId))
     
     const dailyAnimeData = malData.data.filter(malAnimeEntry => allAnimeIds.includes(malAnimeEntry.node.id))
-    const populatedDailyData = dailyAnimeData.map(malAnimeEntry => populateDailyAnimeEntry(malAnimeEntry, dailyAnimeIds))
+
+    const populatedDailyData = []
+    
+    for (const malAnimeEntry of dailyAnimeData) {
+        await delay(1000)
+        const populatedEntry = await populateDailyAnimeEntry(malAnimeEntry, dailyAnimeIds)
+        populatedDailyData.push(populatedEntry)
+    }
 
     return populatedDailyData || []
 }
