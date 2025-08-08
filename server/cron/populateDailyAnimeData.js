@@ -99,7 +99,7 @@ const populateDailyAnimeData = async () => {
     const populatedDailyData = []
     
     for (const malAnimeEntry of dailyAnimeData) {
-        await delay(1000)
+        await delay(2000)
         const populatedEntry = await populateDailyAnimeEntry(malAnimeEntry, dailyAnimeIds)
         populatedDailyData.push(populatedEntry)
     }
